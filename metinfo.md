@@ -202,7 +202,15 @@ if(isset($_GET['address'])){
 [SSRF](https://www.anquanke.com/post/id/101058)
 需要Bypass SSRF
 
-具体的payload暂无
+后分析发现SSRF漏洞的确存在，但无法获取利用flag，原因是因为获取flag需要带参数，但是参数会被parse_url函数进行分割
+例如传入参数为`?address=0://10.0.1.2:80?token=WNHOMGGL;127.0.0.1:80/`
+分割后为
+`Array ( [scheme] => 0 [host] => 10.0.1.2 [port] => 80 [query] => token=WNHOMGGL;127.0.0.1:80/ ) string(19) "curl -v -s 10.0.1.2" `
+导致最后执行的语句为
+`string(19) "curl -v -s 10.0.1.2" `
+
+但是在phpstudy中的7.1以下版本都能试下，靶机中php版本位5.5.9却不能成功，其中的可能与一些默认配置相关，还需要在探究。
+
 
 
 ## 防护方法
@@ -214,8 +222,6 @@ ivear metinfo CMS
 
 CMS通常会有许多安全研究员挖掘漏洞，所以我们需要拿到版本号去搜寻，拿现成漏洞
 网站最下方拿到`Powered by  MetInfo  6.0.0 `
-
-`/install`
 
 [metinfo 6.0.0漏洞](https://www.anquanke.com/post/id/154149#h2-3)
 分析得到这个CMS存在很多现有的漏洞，我们可以直接去利用
